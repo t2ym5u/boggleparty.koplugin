@@ -8,6 +8,14 @@ Everyone grabs a sheet of paper. The e-reader shows the letter grid and a countd
 
 No typing during the game — just eyes on the grid and pencil on paper.
 
+## Rules
+
+- Letters must be adjacent (horizontally, vertically, or diagonally).
+- Each letter may be used only once per word.
+- Minimum 3 letters.
+- Words found by more than one player are cancelled — only unique words score.
+- Scoring: 3–4 letters = 1 pt, 5 = 2 pts, 6 = 3 pts, 7 = 5 pts, 8+ = 11 pts.
+
 ## Features
 
 - **Large grid** — letters fill the screen for easy reading across a table
