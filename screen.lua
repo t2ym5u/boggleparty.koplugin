@@ -21,7 +21,7 @@ local TextWidget      = require("ui/widget/textwidget")
 local UIManager       = require("ui/uimanager")
 local VerticalGroup   = require("ui/widget/verticalgroup")
 local VerticalSpan    = require("ui/widget/verticalspan")
-local _               = require("gettext")
+local _               = require("i18n")
 
 local MenuHelper   = require("menu_helper")
 local ScreenBase   = require("screen_base")
@@ -32,7 +32,7 @@ local DeviceScreen = Device.screen
 
 local DEFAULT_DURATION = 180  -- 3 minutes
 
-local RULES_EN = _([[
+local GAME_RULES_EN = _([[
 Boggle Party — Rules
 
 Everyone gets a sheet of paper. When the timer starts, all players simultaneously search for words in the grid.
@@ -48,7 +48,7 @@ When time runs out:
 • Score only your unique words.
 ]])
 
-local RULES_FR = [[
+local GAME_RULES_FR = [[
 Boggle Party — Règles
 
 Chaque joueur prend une feuille. Au signal, tous cherchent simultanément des mots dans la grille.
@@ -260,7 +260,7 @@ function PartyScreen:buildLayout()
             { id = "lang_btn", text = self:_langLabel(),
               callback = function() self:openLangMenu() end },
             { text = _("Time"),      callback = function() self:openDurationMenu() end },
-            self:makeRulesButtonConfig(RULES_EN, RULES_FR),
+            self:makeRulesButtonConfig(GAME_RULES_EN, GAME_RULES_FR),
             self:makeCloseButtonConfig(),
         }}
     else
@@ -269,7 +269,7 @@ function PartyScreen:buildLayout()
             { id = "lang_btn", text = self:_langLabel(),
               callback = function() self:openLangMenu() end },
             { text = _("Time"),      callback = function() self:openDurationMenu() end },
-            self:makeRulesButtonConfig(RULES_EN, RULES_FR),
+            self:makeRulesButtonConfig(GAME_RULES_EN, GAME_RULES_FR),
             self:makeCloseButtonConfig(),
         }}
     end
@@ -368,25 +368,9 @@ function PartyScreen:buildLayout()
         }
     else
         if playing then
-            self.layout = VerticalGroup:new{
-                align = "center",
-                vspan,
-                button_table,
-                vspan,
-                board_frame,
-                vspan,
-                self.timer_widget,
-            }
+            self:buildPortraitLayout(button_table, board_frame, self.timer_widget)
         else
-            self.layout = VerticalGroup:new{
-                align = "center",
-                vspan,
-                button_table,
-                vspan,
-                board_frame,
-                vspan,
-                right_panel,
-            }
+            self:buildPortraitLayout(button_table, board_frame, right_panel)
         end
     end
 
