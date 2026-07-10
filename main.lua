@@ -1,6 +1,6 @@
 local _dir = debug.getinfo(1, "S").source:sub(2):match("(.*[/\\])") or "./"
 -- _dir contains board.lua / words_*.lua as symlinks (dev) or copied files (installed zip)
-package.path = _dir .. "?.lua;" .. _dir .. "common/?.lua;" .. _dir .. "../game-common/?.lua;" .. package.path
+package.path = _dir .. "?.lua;" .. _dir .. "common/?.lua;" .. package.path
 
 local function lrequire(name)
     local key = _dir .. name
