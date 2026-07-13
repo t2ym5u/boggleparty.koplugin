@@ -55,7 +55,7 @@ function BoardDisplay:paintTo(bb, x, y)
             local cy = y + (r - 1) * cell
             bb:paintRect(cx + pad, cy + pad, cell - 2 * pad, cell - 2 * pad, C_TILE)
             centeredText(bb, self.board.grid[r][c], self.letter_face,
-                cx + cell // 2, cy + cell // 2)
+                cx + math.floor(cell / 2), cy + math.floor(cell / 2))
         end
     end
 
