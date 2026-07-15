@@ -252,34 +252,18 @@ function PartyScreen:buildLayout()
         and math.max(math.floor(sw * 0.40), 120)
         or  math.floor(sw * 0.92)
 
-    local btn_row
-    if playing then
-        btn_row = {{
-            { text = _("New"),       callback = function() self:onNewGame()    end },
-            { text = _("Solutions"), callback = function() self:onSolveNow()   end },
-            { id = "lang_btn", text = self:_langLabel(),
-              callback = function() self:openLangMenu() end },
-            { text = _("Time"),      callback = function() self:openDurationMenu() end },
-            self:makeRulesButtonConfig(GAME_RULES_EN, GAME_RULES_FR),
-            self:makeCloseButtonConfig(),
-        }}
-    else
-        btn_row = {{
-            { text = _("New"),       callback = function() self:onNewGame()    end },
-            { id = "lang_btn", text = self:_langLabel(),
-              callback = function() self:openLangMenu() end },
-            { text = _("Time"),      callback = function() self:openDurationMenu() end },
-            self:makeRulesButtonConfig(GAME_RULES_EN, GAME_RULES_FR),
-            self:makeCloseButtonConfig(),
-        }}
-    end
-
-    local button_table = ButtonTable:new{
-        shrink_unneeded_width = true,
-        width   = btn_width,
-        buttons = btn_row,
-    }
-    self.lang_btn = button_table:getButtonById("lang_btn")
+    local title_bar = self:buildTitleBar(_("Boggle Party"), function()
+        local items = {
+            { text = _("New game"), callback = function() self:onNewGame() end },
+        }
+        if self.phase == "playing" then
+            items[#items + 1] = { text = _("Solutions"), callback = function() self:onSolveNow() end }
+        end
+        items[#items + 1] = { text = self:_langLabel(), callback = function() self:openLangMenu() end }
+        items[#items + 1] = { text = _("Duration"),     callback = function() self:openDurationMenu() end }
+        items[#items + 1] = self:makeRulesButtonConfig(GAME_RULES_EN, GAME_RULES_FR)
+        return items
+    end)
 
     -- Board size: large while playing, smaller in solution view
     local board_size
@@ -320,8 +304,6 @@ function PartyScreen:buildLayout()
         if is_landscape then
             right_panel = VerticalGroup:new{
                 align = "center",
-                button_table,
-                VerticalSpan:new{ width = Size.span.vertical_large * 3 },
                 self.timer_widget,
             }
         else
@@ -348,8 +330,6 @@ function PartyScreen:buildLayout()
         if is_landscape then
             right_panel = VerticalGroup:new{
                 align = "center",
-                button_table,
-                VerticalSpan:new{ width = Size.span.vertical_large },
                 sol_widget,
             }
         else
@@ -358,23 +338,22 @@ function PartyScreen:buildLayout()
     end
 
     -- Assemble
-    local vspan = VerticalSpan:new{ width = Size.span.vertical_large }
     if is_landscape then
-        self.layout = HorizontalGroup:new{
+        local content = HorizontalGroup:new{
             align = "center",
             board_frame,
             HorizontalSpan:new{ width = Size.span.horizontal_default },
             right_panel,
         }
+        self:buildLandscapeLayout(title_bar, content)
     else
         if playing then
-            self:buildPortraitLayout(button_table, board_frame, self.timer_widget)
+            self:buildPortraitLayout(title_bar, board_frame, self.timer_widget)
         else
-            self:buildPortraitLayout(button_table, board_frame, right_panel)
+            self:buildPortraitLayout(title_bar, board_frame, right_panel)
         end
     end
 
-    self[1] = self.layout
     self:updateStatus()
 end
 
