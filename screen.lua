@@ -15,8 +15,8 @@ local Font            = require("ui/font")
 local FrameContainer  = require("ui/widget/container/framecontainer")
 local HorizontalGroup = require("ui/widget/horizontalgroup")
 local HorizontalSpan  = require("ui/widget/horizontalspan")
+local ScrollTextWidget = require("ui/widget/scrolltextwidget")
 local Size            = require("ui/size")
-local TextBoxWidget   = require("ui/widget/textboxwidget")
 local TextWidget      = require("ui/widget/textwidget")
 local UIManager       = require("ui/uimanager")
 local VerticalGroup   = require("ui/widget/verticalgroup")
@@ -73,6 +73,7 @@ local PartyScreen = ScreenBase:extend{}
 function PartyScreen:init()
     local lang = self.plugin:getSetting("lang", "en")
     self.duration       = self.plugin:getSetting("duration", DEFAULT_DURATION)
+    self.show_timer     = self.plugin:getSetting("show_timer", true)
     self.time_remaining = self.duration
     self.phase          = "playing"  -- "playing" | "solved"
     self.timer_running  = false
@@ -179,6 +180,7 @@ function PartyScreen:openDurationMenu()
         { id = 180, text = "3:00" },
         { id = 240, text = "4:00" },
         { id = 300, text = "5:00" },
+        { id = "__toggle_timer__", text = self.show_timer and _("Hide timer") or _("Show timer") },
     }
     MenuHelper.openPickerMenu{
         title      = _("Duration"),
@@ -186,9 +188,16 @@ function PartyScreen:openDurationMenu()
         current_id = self.duration,
         parent     = self,
         on_select  = function(dur)
-            self.duration = dur
-            self.plugin:saveSetting("duration", dur)
-            self:onNewGame()
+            if dur == "__toggle_timer__" then
+                self.show_timer = not self.show_timer
+                self.plugin:saveSetting("show_timer", self.show_timer)
+                self:buildLayout()
+                UIManager:setDirty(self, function() return "ui", self.dimen end)
+            else
+                self.duration = dur
+                self.plugin:saveSetting("duration", dur)
+                self:onNewGame()
+            end
         end,
     }
 end
@@ -292,23 +301,23 @@ function PartyScreen:buildLayout()
     -- Right / bottom panel
     local right_panel
     if playing then
-        -- Big countdown timer
-        local timer_fs = is_landscape
-            and math.max(24, math.min(math.floor(sh * 0.18), 130))
-            or  math.max(24, math.min(math.floor(sw * 0.18), 130))
-        self.timer_widget = TextWidget:new{
-            text = self:_timerText(),
-            face = Font:getFace("cfont", timer_fs),
-        }
-
-        if is_landscape then
-            right_panel = VerticalGroup:new{
-                align = "center",
-                self.timer_widget,
+        self.timer_widget = nil
+        if self.show_timer then
+            -- Big countdown timer
+            local timer_fs = is_landscape
+                and math.max(24, math.min(math.floor(sh * 0.18), 130))
+                or  math.max(24, math.min(math.floor(sw * 0.18), 130))
+            self.timer_widget = TextWidget:new{
+                text = self:_timerText(),
+                face = Font:getFace("cfont", timer_fs),
             }
-        else
-            -- Portrait: timer goes below the grid, so we expose it separately
-            self.timer_widget_below = self.timer_widget
+
+            if is_landscape then
+                right_panel = VerticalGroup:new{
+                    align = "center",
+                    self.timer_widget,
+                }
+            end
         end
     else
         self.timer_widget = nil
@@ -320,11 +329,12 @@ function PartyScreen:buildLayout()
             and math.floor(sh * 0.72)
             or  math.floor(sh * 0.44)
 
-        local sol_widget = TextBoxWidget:new{
+        local sol_widget = ScrollTextWidget:new{
             text   = self:_buildSolutionText(),
             face   = Font:getFace("smallinfofont"),
             width  = sol_w,
             height = sol_h,
+            dialog = self,
         }
 
         if is_landscape then
@@ -339,12 +349,17 @@ function PartyScreen:buildLayout()
 
     -- Assemble
     if is_landscape then
-        local content = HorizontalGroup:new{
-            align = "center",
-            board_frame,
-            HorizontalSpan:new{ width = Size.span.horizontal_default },
-            right_panel,
-        }
+        local content
+        if right_panel then
+            content = HorizontalGroup:new{
+                align = "center",
+                board_frame,
+                HorizontalSpan:new{ width = Size.span.horizontal_default },
+                right_panel,
+            }
+        else
+            content = board_frame
+        end
         self:buildLandscapeLayout(title_bar, content)
     else
         if playing then
