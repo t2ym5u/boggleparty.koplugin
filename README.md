@@ -2,6 +2,10 @@
 
 A **Boggle Party** display plugin for [KOReader](https://github.com/koreader/koreader) — put your e-reader in the middle of the table and play Boggle with pen and paper.
 
+## Screenshot
+
+![Screenshot](images/boggle-party.png)
+
 ## Concept
 
 Everyone grabs a sheet of paper. The e-reader shows the letter grid and a countdown timer. When time's up, players read their lists aloud: words found by more than one player are cancelled. Then tap **Solutions** to reveal every valid word on the grid.
