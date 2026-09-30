@@ -25,7 +25,7 @@ No typing during the game — just eyes on the grid and pencil on paper.
 - **Large grid** — letters fill the screen for easy reading across a table
 - **Countdown timer** — 2, 3, 4 or 5 minutes (configurable); auto-reveals solutions at zero
 - **Solutions view** — all possible words grouped by length with totals
-- **Two languages** — EN and FR dictionaries (borrowed from `boggle.koplugin`)
+- **Two languages** — EN (105,145 words, from the Public-Domain [ENABLE](https://github.com/dolph/dictionary) word-game list) and FR (47,435 words); shared with `boggle.koplugin`
 - **E-ink friendly** — grid is static during play; only the timer digit refreshes (fast/A2 mode)
 
 ## Scoring (standard Boggle)
